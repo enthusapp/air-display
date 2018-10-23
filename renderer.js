@@ -72,7 +72,7 @@ xhr.onreadystatechange = function () {
       [].forEach.call(tagSels(data.documentElement, 'item'), el => {
         if (tagSel(el, 'stationName').textContent === '중구') {
           console.log(el);
-          var result = `측정시간: ${tagSel(el, 'dataTime').textContent}`;
+          var result = `${tagSel(el, 'dataTime').textContent}`;
           var pm10Grade1h = parseInt(tagSel(el, 'pm10Grade1h').textContent);
           var pm25Grade1h = parseInt(tagSel(el, 'pm25Grade1h').textContent);
           result += `, 미세: ${tagSel(el, 'pm10Value').textContent} μg/㎡(${coutList[pm10Grade1h].msg})`;
