@@ -1,0 +1,25 @@
+{
+  "name": "enthus-air-display",
+  "version": "1.0.0",
+  "description": "ENTHUS Air Display System",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "dev": "cross-env NODE_ENV=development electron ."
+  },
+  "repository": "https://github.com/enthusapp/air-display",
+  "keywords": [
+    "Electron",
+    "quick",
+    "start",
+    "tutorial",
+    "demo"
+  ],
+  "author": "ENTHUS",
+  "devDependencies": {
+    "electron": "^3.0.4",
+    "cross-env": "^5.2.0"
+  },
+  "dependencies": {
+  }
+}
