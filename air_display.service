@@ -1,0 +1,14 @@
+[Unit]
+Description=ENTHUS Air Display
+After=multi-user.target
+ 
+[Service]
+User=pi
+Type=idle
+WorkingDirectory=/home/pi/air-display
+ExecStart=/usr/bin/yarn start 
+Restart=always
+Environment=DISPLAY=:0.0
+ 
+[Install]
+WantedBy=multi-user.target
