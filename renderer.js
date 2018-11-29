@@ -130,7 +130,6 @@ xhr.onreadystatechange = function () {
   }
 };
 
-
 var state = "boot";
 var isFirstArrived = false;
 var interval = setInterval(getRealTimeEachCity, 1);
