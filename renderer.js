@@ -33,22 +33,18 @@ function getRealTimeEachStation() {
 }
 
 function getRealTimeEachCity() {
-  var sendData = [DataAPI, ServiceAPIs.mesureAir, APIs.realTimeEachCity].join('/');
-  sendData += '?sidoName=서울';
-  sendData += `&dataTerm=${dataTerm}&pageNo=1&numOfRows=10&ServiceKey=${ServiceKey}&ver=${APIver}`;
-
-  document.getElementById('result').innerText = '데이터를 읽어오는 중입니다...';
-  xhr.open('GET', sendData);
-  xhr.send();
   switch (state) {
     case "boot":
       clearInterval(interval);
       if (isFirstArrived) {
         interval = setInterval(getRealTimeEachCity, 1000 * 60 * 30);
         state = "30 min interval";
+        console.log(state);
+        return;
       } else {
         interval = setInterval(getRealTimeEachCity, 1000 * 30);
         state = "30 sec interval";
+        console.log(state);
       }
     break;
     case "30 sec interval":
@@ -56,11 +52,21 @@ function getRealTimeEachCity() {
         clearInterval(interval);
         interval = setInterval(getRealTimeEachCity, 1000 * 60 * 30);
         state = "30 min interval";
+        console.log(state);
+        return;
       }
     break;
     default:
     break;
   }
+
+  var sendData = [DataAPI, ServiceAPIs.mesureAir, APIs.realTimeEachCity].join('/');
+  sendData += '?sidoName=서울';
+  sendData += `&dataTerm=${dataTerm}&pageNo=1&numOfRows=10&ServiceKey=${ServiceKey}&ver=${APIver}`;
+
+  document.getElementById('result').innerText = '데이터를 읽어오는 중입니다...';
+  xhr.open('GET', sendData);
+  xhr.send();
 }
 
 function tagSels(doc, name) {
@@ -71,20 +77,31 @@ function tagSel(doc, name) {
   return tagSels(doc, name)[0];
 }
 
-const coutList = {
-  1: {
-    color: "green",
-    msg: "좋음"},
-  2: {
-    color: "orange",
-    msg: "보통"},
-  3: {
-    color: "red",
-    msg: "나쁨"},
-  4: {
-    color: "redpurple",
-    msg: "매우 나쁨"},
-};
+function getCoutList(val) {
+  switch (val) {
+  case 1:
+    return {
+      color: "green",
+      msg: "좋음"};
+  case 2:
+    return {
+      color: "orange",
+      msg: "보통"};
+  case 3:
+    return {
+      color: "red",
+      msg: "나쁨"};
+  case 4:
+    return {
+      color: "redpurple",
+      msg: "매우 나쁨"};
+  default:
+    break;
+  }
+  return {
+    color: "black",
+    msg: "확인 안됨"};
+}
 
 xhr.onreadystatechange = function () {
   if (xhr.readyState === XMLHttpRequest.DONE) {
@@ -96,10 +113,14 @@ xhr.onreadystatechange = function () {
           var result = `${tagSel(el, 'dataTime').textContent}`;
           var pm10Grade1h = parseInt(tagSel(el, 'pm10Grade1h').textContent);
           var pm25Grade1h = parseInt(tagSel(el, 'pm25Grade1h').textContent);
-          result += `, 미세: ${tagSel(el, 'pm10Value').textContent} μg/㎡(${coutList[pm10Grade1h].msg})`;
-          result += `, 초미세: ${tagSel(el, 'pm25Value').textContent} μg/㎡(${coutList[pm25Grade1h].msg})`;
+
+          result += `, 미세: ${tagSel(el, 'pm10Value').textContent} `;
+          result += `μg/㎡(${getCoutList(pm10Grade1h).msg})`;
+          result += `, 초미세: ${tagSel(el, 'pm25Value').textContent} `;
+          result += `μg/㎡(${getCoutList(pm25Grade1h).msg})`;
+
           document.getElementById('result').innerText = result;
-          document.getElementById('body').style.backgroundColor = coutList[Math.max(pm10Grade1h, pm25Grade1h)].color;
+          document.getElementById('body').style.backgroundColor = getCoutList(Math.max(pm10Grade1h, pm25Grade1h)).color;
           isFirstArrived = true;
         }
       });
@@ -112,4 +133,4 @@ xhr.onreadystatechange = function () {
 
 var state = "boot";
 var isFirstArrived = false;
-var interval = setInterval(getRealTimeEachCity, 1); // 30 seconds
+var interval = setInterval(getRealTimeEachCity, 1);
