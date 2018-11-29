@@ -40,6 +40,27 @@ function getRealTimeEachCity() {
   document.getElementById('result').innerText = '데이터를 읽어오는 중입니다...';
   xhr.open('GET', sendData);
   xhr.send();
+  switch (state) {
+    case "boot":
+      clearInterval(interval);
+      if (isFirstArrived) {
+        interval = setInterval(getRealTimeEachCity, 1000 * 60 * 30);
+        state = "30 min interval";
+      } else {
+        interval = setInterval(getRealTimeEachCity, 1000 * 30);
+        state = "30 sec interval";
+      }
+    break;
+    case "30 sec interval":
+      if (isFirstArrived) {
+        clearInterval(interval);
+        interval = setInterval(getRealTimeEachCity, 1000 * 60 * 30);
+        state = "30 min interval";
+      }
+    break;
+    default:
+    break;
+  }
 }
 
 function tagSels(doc, name) {
@@ -79,6 +100,7 @@ xhr.onreadystatechange = function () {
           result += `, 초미세: ${tagSel(el, 'pm25Value').textContent} μg/㎡(${coutList[pm25Grade1h].msg})`;
           document.getElementById('result').innerText = result;
           document.getElementById('body').style.backgroundColor = coutList[Math.max(pm10Grade1h, pm25Grade1h)].color;
+          isFirstArrived = true;
         }
       });
     } else {
@@ -87,5 +109,7 @@ xhr.onreadystatechange = function () {
   }
 };
 
-getRealTimeEachCity();
-setInterval(getRealTimeEachCity, 1000 * 60 * 30); // 30 minute
+
+var state = "boot";
+var isFirstArrived = false;
+var interval = setInterval(getRealTimeEachCity, 1); // 30 seconds
