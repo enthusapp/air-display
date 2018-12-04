@@ -114,6 +114,7 @@ xhr.onreadystatechange = function () {
           var pm10Grade1h = parseInt(tagSel(el, 'pm10Grade1h').textContent);
           var pm25Grade1h = parseInt(tagSel(el, 'pm25Grade1h').textContent);
 
+          result += ` 종로구 중구`;
           result += `,<br>미세: ${tagSel(el, 'pm10Value').textContent} `;
           result += `μg/㎡(${getCoutList(pm10Grade1h).msg})`;
           result += `,<br>초미세: ${tagSel(el, 'pm25Value').textContent} `;
