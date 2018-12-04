@@ -114,12 +114,12 @@ xhr.onreadystatechange = function () {
           var pm10Grade1h = parseInt(tagSel(el, 'pm10Grade1h').textContent);
           var pm25Grade1h = parseInt(tagSel(el, 'pm25Grade1h').textContent);
 
-          result += `, 미세: ${tagSel(el, 'pm10Value').textContent} `;
+          result += `,<br>미세: ${tagSel(el, 'pm10Value').textContent} `;
           result += `μg/㎡(${getCoutList(pm10Grade1h).msg})`;
-          result += `, 초미세: ${tagSel(el, 'pm25Value').textContent} `;
+          result += `,<br>초미세: ${tagSel(el, 'pm25Value').textContent} `;
           result += `μg/㎡(${getCoutList(pm25Grade1h).msg})`;
 
-          document.getElementById('result').innerText = result;
+          document.getElementById('result').innerHTML = result;
           document.getElementById('body').style.backgroundColor = getCoutList(Math.max(pm10Grade1h, pm25Grade1h)).color;
           isFirstArrived = true;
         }
