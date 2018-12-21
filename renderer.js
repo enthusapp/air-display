@@ -30,41 +30,50 @@ xhr.onreadystatechange = function () {
 
 function showResult(node, data, name) {
   var result = name;
-  var pm10Grade1h = parseInt(data['pm10Grade1h']);
-  var pm25Grade1h = parseInt(data['pm25Grade1h']);
 
-  result += `, 미세: ${data['pm10Value']} `;
-  result += `μg/㎡(${getCoutList(pm10Grade1h).msg})`;
-  result += `, 초미세: ${data['pm25Value']} `;
-  result += `μg/㎡(${getCoutList(pm25Grade1h).msg})`;
+  result += `, 미세: ${data['pm10Value']} μg/㎡`;
+  result += `, 초미세: ${data['pm25Value']} μg/㎡`;
 
   node.innerHTML = result;
 }
 
-function getCoutList(val) {
-  switch (val) {
-  case 1:
-    return {
-      color: "green",
-      msg: "좋음"};
-  case 2:
-    return {
-      color: "orange",
-      msg: "보통"};
-  case 3:
-    return {
-      color: "red",
-      msg: "나쁨"};
-  case 4:
-    return {
-      color: "redpurple",
-      msg: "매우 나쁨"};
-  default:
-    break;
+var seoulLevel = 4;
+var jejuLevel = 3;
+var region = 'seoul';
+var oldLevel = 4;
+var oldColor = '#000000';
+
+function colorBlink() {
+  var level = region === 'seoul' ? seoulLevel : jejuLevel;
+  var td = document.getElementsByTagName('td')[level];
+
+  if (oldLevel != level) {
+    if (oldColor != '#000000') {
+      var tdOld = document.getElementsByTagName('td')[oldLevel];
+      tdOld.setAttribute('style', 'background-color:' + oldColor);
+    }
+    oldLevel = level;
+    oldColor = '#000000';
   }
-  return {
-    color: "black",
-    msg: "확인 안됨"};
+
+  var newColor = oldColor;
+  oldColor = td.getAttribute('style').split(':')[1];
+  td.setAttribute('style', 'background-color:' + newColor);
+
+  setTimeout(colorBlink, newColor === '#000000' ? 500 : 1000);
+}
+
+colorBlink();
+
+jeju.addEventListener('click', () => { selectRegion('jeju'); });
+seoul.addEventListener('click', () => { selectRegion('seoul'); });
+
+var regionNodes = {'seoul': seoul, 'jeju': jeju};
+
+function selectRegion(reg) {
+  region = reg;
+  for (const el in regionNodes)
+    regionNodes[el].style['color'] = el === reg ? "yellow" : "white";
 }
 
 var state = "boot";
