@@ -145,7 +145,8 @@ Object.keys(ifaces).forEach(function (ifname) {
       return;
     }
 
-    document.getElementById('name').innerText = ["Air Display v1.0.0", iface.address].join(' ');
+    document.getElementById('name').innerText =
+      ["Air Display v1.0.0", iface.address].join(', ');
     return false;
   });
 });
