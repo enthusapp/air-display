@@ -9,18 +9,24 @@ if (process.env.NODE_ENV === 'development') {
 var time_result = document.getElementById('time_result');
 var seoul = document.getElementById('seoul_result');
 var jeju = document.getElementById('jeju_result');
+var seoulLevel = 4;
+var jejuLevel = 3;
 
 xhr.onreadystatechange = function () {
   if (xhr.readyState === XMLHttpRequest.DONE) {
     if (xhr.status === 200) {
       var data = JSON.parse(xhr.responseText);
+      var seoulData = getRegionObject(data, '서울');
+      var jejuData = getRegionObject(data, '제주');
 
-      time_result.innerText = data['서울'].list[0].dataTime;
-      showResult(seoul, data['서울'].list[0], '서울 중구');
-      showResult(jeju, data['제주'].list[0], '제주 이도동');
-      /*
-      document.getElementById('body').style.backgroundColor =
-        getCoutList(Math.max(pm10Grade1h, pm25Grade1h)).color;*/
+      time_result.innerText = seoulData.dataTime;
+
+      showResult(seoul, seoulData, '서울');
+      showResult(jeju, jejuData, '제주');
+
+      seoulLevel = getLevel(seoulData);
+      jejuLevel = getLevel(jejuData);
+
       isFirstArrived = true;
     } else {
       console.log('[' + xhr.status + ']: ' + xhr.statusText);
@@ -28,8 +34,21 @@ xhr.onreadystatechange = function () {
   }
 };
 
+function getLevel(data) {
+  var value = Math.max(parseInt(data.pm10Value), parseInt(data.pm25Value));
+
+  if (value < 20) { return 0; }
+  if (value < 30) { return 1; }
+  if (value < 40) { return 2; }
+  if (value < 50) { return 3; }
+  if (value < 60) { return 4; }
+  if (value < 70) { return 5; }
+  if (value < 80) { return 6; }
+  return 7;
+}
+
 function showResult(node, data, name) {
-  var result = name;
+  var result = [name, data['stationName']].join(' ');
 
   result += `, 미세: ${data['pm10Value']} μg/㎡`;
   result += `, 초미세: ${data['pm25Value']} μg/㎡`;
@@ -37,43 +56,8 @@ function showResult(node, data, name) {
   node.innerHTML = result;
 }
 
-var seoulLevel = 4;
-var jejuLevel = 3;
-var region = 'seoul';
-var oldLevel = 4;
-var oldColor = '#000000';
-
-function colorBlink() {
-  var level = region === 'seoul' ? seoulLevel : jejuLevel;
-  var td = document.getElementsByTagName('td')[level];
-
-  if (oldLevel != level) {
-    if (oldColor != '#000000') {
-      var tdOld = document.getElementsByTagName('td')[oldLevel];
-      tdOld.setAttribute('style', 'background-color:' + oldColor);
-    }
-    oldLevel = level;
-    oldColor = '#000000';
-  }
-
-  var newColor = oldColor;
-  oldColor = td.getAttribute('style').split(':')[1];
-  td.setAttribute('style', 'background-color:' + newColor);
-
-  setTimeout(colorBlink, newColor === '#000000' ? 500 : 1000);
-}
-
-colorBlink();
-
-jeju.addEventListener('click', () => { selectRegion('jeju'); });
-seoul.addEventListener('click', () => { selectRegion('seoul'); });
-
-var regionNodes = {'seoul': seoul, 'jeju': jeju};
-
-function selectRegion(reg) {
-  region = reg;
-  for (const el in regionNodes)
-    regionNodes[el].style['color'] = el === reg ? "yellow" : "white";
+function getRegionObject(data, name) {
+  return data[name].list[0];
 }
 
 var state = "boot";
@@ -113,4 +97,41 @@ function getRealTimeEachCity() {
 
   xhr.setRequestHeader("Cache-Control", "max-age=0");
   xhr.send();
+}
+
+var region = 'seoul';
+var oldLevel = 4;
+var oldColor = '#000000';
+
+function colorBlink() {
+  var level = region === 'seoul' ? seoulLevel : jejuLevel;
+  var td = document.getElementsByTagName('td')[level];
+
+  if (oldLevel != level) {
+    if (oldColor != '#000000') {
+      var tdOld = document.getElementsByTagName('td')[oldLevel];
+      tdOld.setAttribute('style', 'background-color:' + oldColor);
+    }
+    oldLevel = level;
+    oldColor = '#000000';
+  }
+
+  var newColor = oldColor;
+  oldColor = td.getAttribute('style').split(':')[1];
+  td.setAttribute('style', 'background-color:' + newColor);
+
+  setTimeout(colorBlink, newColor === '#000000' ? 500 : 1000);
+}
+
+colorBlink();
+
+jeju.addEventListener('click', () => { selectRegion('jeju'); });
+seoul.addEventListener('click', () => { selectRegion('seoul'); });
+
+var regionNodes = {'seoul': seoul, 'jeju': jeju};
+
+function selectRegion(reg) {
+  region = reg;
+  for (const el in regionNodes)
+    regionNodes[el].style['color'] = el === reg ? "yellow" : "white";
 }
