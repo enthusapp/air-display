@@ -1,11 +1,5 @@
 var xhr = new XMLHttpRequest();
 
-if (process.env.NODE_ENV === 'development') {
-  xhr.open('GET', 'file:///1234');
-} else {
-  xhr.open('GET', 'https://s3.ap-northeast-2.amazonaws.com/enthusair/1234');
-}
-
 var time_result = document.getElementById('time_result');
 var seoul = document.getElementById('seoul_result');
 var jeju = document.getElementById('jeju_result');
@@ -69,8 +63,8 @@ function getRealTimeEachCity() {
     case "boot":
       clearInterval(interval);
       if (isFirstArrived) {
-        interval = setInterval(getRealTimeEachCity, 1000 * 60 * 30);
-        state = "30 min interval";
+        interval = setInterval(getRealTimeEachCity, 1000 * 60 * 10);
+        state = "10 min interval";
         console.log(state);
         return;
       } else {
@@ -82,8 +76,8 @@ function getRealTimeEachCity() {
     case "30 sec interval":
       if (isFirstArrived) {
         clearInterval(interval);
-        interval = setInterval(getRealTimeEachCity, 1000 * 60 * 30);
-        state = "30 min interval";
+        interval = setInterval(getRealTimeEachCity, 1000 * 60 * 10);
+        state = "10 min interval";
         console.log(state);
         return;
       }
@@ -92,9 +86,11 @@ function getRealTimeEachCity() {
     break;
   }
 
+  console.log(new Date().toISOString() + 'send');
   if (!isFirstArrived)
     seoul.innerText = '데이터를 읽어오는 중입니다...';
 
+  xhr.open('GET', 'https://s3.ap-northeast-2.amazonaws.com/enthusair/1234');
   xhr.setRequestHeader("Cache-Control", "max-age=0");
   xhr.send();
 }
