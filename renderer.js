@@ -10,10 +10,12 @@ xhr.onreadystatechange = function () {
   if (xhr.readyState === XMLHttpRequest.DONE) {
     if (xhr.status === 200) {
       var data = JSON.parse(xhr.responseText);
-      var seoulData = getRegionObject(data, '서울');
-      var jejuData = getRegionObject(data, '제주');
+      var seoulData = getRegionObject(data, '서울', 0);
+      var jejuData = getRegionObject(data, '제주', 1);
 
       time_result.innerText = seoulData.dataTime;
+
+//		console.log(data);
 
       showResult(seoul, seoulData, '서울');
       showResult(jeju, jejuData, '제주');
@@ -50,8 +52,8 @@ function showResult(node, data, name) {
   node.innerHTML = result;
 }
 
-function getRegionObject(data, name) {
-  return data[name].list[0];
+function getRegionObject(data, name, index) {
+  return data[name].list[index];
 }
 
 var state = "boot";
