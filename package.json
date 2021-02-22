@@ -17,7 +17,7 @@
   ],
   "author": "ENTHUS",
   "devDependencies": {
-    "electron": ">=9.4.0",
+    "electron": "^3.0.4",
     "cross-env": "^5.2.0"
   },
   "dependencies": {
