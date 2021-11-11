@@ -6,22 +6,22 @@ var jeju = document.getElementById('jeju_result');
 var seoulLevel = 4;
 var jejuLevel = 3;
 
+const getCodeItems = ({ response: { body: { items } } }) => items[0];
+const getItems = (data, code) => getCodeItems(data[code]);
+const getCity = (data, code, city) => parseInt(getItems(data, code)[city]);
+
 xhr.onreadystatechange = function () {
   if (xhr.readyState === XMLHttpRequest.DONE) {
     if (xhr.status === 200) {
       var data = JSON.parse(xhr.responseText);
-      var seoulData = getRegionObject(data, '서울', 0);
-      var jejuData = getRegionObject(data, '제주', 1);
 
-      time_result.innerText = seoulData.dataTime;
+      time_result.innerText = getItems(data, 'pm10').dataTime;
 
-//		console.log(data);
+      showResult(seoul, data, 'seoul', '서울');
+      showResult(jeju, data, 'jeju', '제주');
 
-      showResult(seoul, seoulData, '서울');
-      showResult(jeju, jejuData, '제주');
-
-      seoulLevel = getLevel(seoulData);
-      jejuLevel = getLevel(jejuData);
+      seoulLevel = getLevel(data, 'seoul');
+      jejuLevel = getLevel(data, 'jeju');
 
       isFirstArrived = true;
     } else {
@@ -30,8 +30,10 @@ xhr.onreadystatechange = function () {
   }
 };
 
-function getLevel(data) {
-  var value = Math.max(parseInt(data.pm10Value), parseInt(data.pm25Value));
+function getLevel(data, city) {
+  const pm10 = getCity(data, 'pm10', city);
+  const pm25 = getCity(data, 'pm25', city);
+  const value = Math.max(pm10, pm25);
 
   if (value < 20) { return 0; }
   if (value < 30) { return 1; }
@@ -43,17 +45,13 @@ function getLevel(data) {
   return 7;
 }
 
-function showResult(node, data, name) {
-  var result = [name, data['stationName']].join(' ');
+function showResult(node, data, city, name) {
+  var result = name;
 
-  result += `, 미세: ${data['pm10Value']} μg/㎡`;
-  result += `, 초미세: ${data['pm25Value']} μg/㎡`;
+  result += `, 미세: ${getCity(data, 'pm10', city)} μg/㎡`;
+  result += `, 초미세: ${getCity(data, 'pm25', city)} μg/㎡`;
 
   node.innerHTML = result;
-}
-
-function getRegionObject(data, name, index) {
-  return data[name].list[index];
 }
 
 var state = "boot";
